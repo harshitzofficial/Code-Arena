@@ -292,5 +292,5 @@ After a submission, Gemini 2.5 Flash returns a structured verdict:
   "analysis": "Good use of sorting. Edge case on empty array missed."
 }
 ```
-
 ---
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/harshitzofficial/Code-Arena)
