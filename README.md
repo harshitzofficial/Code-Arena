@@ -294,11 +294,3 @@ After a submission, Gemini 2.5 Flash returns a structured verdict:
 ```
 
 ---
----
-
-<div align="center">
-
-Built with ❤️ by [harshitzofficial](https://github.com/harshitzofficial)
-
-</div>
-
