@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { db } from "./config/firebase-admin.js";
 import { LeetCode } from "leetcode-query";
 let problemSet = [];
