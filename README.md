@@ -47,26 +47,69 @@ The platform uses a **Driver-Observer** pattern: one participant (the Driver) wr
 Code Arena is built with a decoupled architecture: a **React/Vite** frontend and a **Node.js/Express** backend, with **Firebase** as the real-time synchronization layer and data store.
 
 ```mermaid
-graph TD
-    subgraph "Client (Frontend)"
-        App --> FirebaseProvider
-        FirebaseProvider --> RoomPage
-        RoomPage --> EditorComponent
-        RoomPage --> CollabTools
+graph TB
+    subgraph "Client - React Frontend (Vite + Tailwind)"
+        direction TB
+        Main["main.jsx / App.jsx<br>React Router"]
+
+        subgraph "Pages"
+            HP["HomePage"]
+            LP["LoginPage"]
+            LB["Lobby"]
+            RM["Room"]
+            RS["Results"]
+        end
+
+        subgraph "Room Components"
+            ED["editor.jsx<br>(Monaco Editor)"]
+            PR["problem.jsx<br>Problem Display"]
+            PP["prob_picker.jsx<br>Topic/Difficulty Picker"]
+            CH["chat.jsx<br>Text Chat"]
+            VC["voicechat.jsx<br>WebRTC Voice (Simple-Peer)"]
+            WB["whiteboard.jsx<br>Shared Canvas"]
+            TM["timer.jsx"]
+            SC["prob_score.jsx<br>Score Modal"]
+        end
+
+        subgraph "Service Layer"
+            FP["FirebaseProvider<br>(React Context)"]
+            API["api.js<br>(REST Client)"]
+        end
+
+        Main --> HP & LP & LB & RM & RS
+        RM --> ED & PR & PP & CH & VC & WB & TM & SC
+        ED --> FP
+        CH --> FP
+        WB --> FP
+        ED --> API
     end
 
-    subgraph "Cloud Services"
-        FirebaseProvider -- "Real-time Sync" --> Firebase_RTDB
-        FirebaseProvider -- "Auth" --> Firebase_Auth
+    subgraph "Backend - Node.js / Express"
+        SRV["server.js<br>Express App + CORS"]
+        RT["routes.js<br>API Endpoints"]
+        CTRL["controller.js<br>Game State Machine"]
+
+        SRV --> RT --> CTRL
     end
 
-    subgraph "Server (Backend)"
-        Express_Server -- "Admin Privileges" --> Firebase_RTDB
-        Express_Server -- "AI Judging" --> Gemini_API
-        Express_Server -- "Problem Data" --> LeetCode_Query
+    subgraph "External APIs"
+        GEMINI["Google Gemini 2.5 Flash Lite<br>(AI Judge + Test Case Gen)"]
+        LC["LeetCode API<br>(leetcode-query)"]
     end
 
-    RoomPage -- "REST API Calls" --> Express_Server
+    subgraph "Firebase Cloud Services"
+        AUTH["Firebase Auth<br>(Anonymous + Google)"]
+        RTDB[("Firebase Realtime Database")]
+    end
+
+    FP -- "Auth (Anonymous / Google)" --> AUTH
+    FP -- "Real-time Sync<br>/liveContent (editor, chat, whiteboard)<br>/rooms (gameState)" --> RTDB
+
+    API -- "REST: /createGame, /fetchProblem,<br>/runCode, /nextRound" --> RT
+
+    RT -- "Generate test cases<br>+ Judge code" --> GEMINI
+    CTRL -- "Fetch problems" --> LC
+    CTRL -- "Admin SDK read/write<br>gameState, roundHistory,<br>driver rotation" --> RTDB
 ```
 
 ### Development Data Flow
